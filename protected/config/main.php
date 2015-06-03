@@ -14,6 +14,7 @@ return array(
 
 	// autoloading model and component classes
 	'import'=>array(
+        'common.models.*',
 		'application.models.*',
 		'application.components.*',
         'application.components.sms.*',
@@ -61,7 +62,7 @@ return array(
 		*/
 
 		// database settings are configured in database.php
-		'db'=>require(dirname(__FILE__).'/database.php'),
+		'db'=>require(dirname(__FILE__).'/../../common/config/database.php'),
 
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors

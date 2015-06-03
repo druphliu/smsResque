@@ -2,6 +2,7 @@
 
 // This is the configuration for yiic console application.
 // Any writable CConsoleApplication properties can be configured here.
+Yii::setPathOfAlias('common', dirname(__DIR__).'/../common');
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'My Console Application',
@@ -10,6 +11,7 @@ return array(
 	'preload'=>array('log'),
 
     'import'=>array(
+        'common.models.*',
         'application.models.*',
         'application.components.*',
         'application.components.sms.*',
@@ -27,7 +29,7 @@ return array(
             'logtarget' => '/var/log/mylog' // Target log file or configuration (please refer to logging section)
         ),
 		// database settings are configured in database.php
-		'db'=>require(dirname(__FILE__).'/database.php'),
+        'db'=>require(dirname(__FILE__).'/../../common/config/database.php'),
 
 		'log'=>array(
 			'class'=>'CLogRouter',
