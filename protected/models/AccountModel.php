@@ -11,6 +11,7 @@
  * @property string $type
  * @property string $template
  * @property string $class
+ * @property string $title
  */
 class AccountModel extends CActiveRecord
 {
@@ -39,9 +40,10 @@ class AccountModel extends CActiveRecord
 			array('type', 'length', 'max'=>5),
 			array('template', 'length', 'max'=>255),
 			array('class', 'length', 'max'=>25),
+			array('title', 'length', 'max'=>35),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, name, pswd, user_id, type, template, class', 'safe', 'on'=>'search'),
+			array('id, name, pswd, user_id, type, template, class, title', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -69,6 +71,7 @@ class AccountModel extends CActiveRecord
 			'type' => 'Type',
 			'template' => '模板[尾巴]',
 			'class' => '发�?类名',
+			'title' => 'Title',
 		);
 	}
 
@@ -97,6 +100,7 @@ class AccountModel extends CActiveRecord
 		$criteria->compare('type',$this->type,true);
 		$criteria->compare('template',$this->template,true);
 		$criteria->compare('class',$this->class,true);
+		$criteria->compare('title',$this->title,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
