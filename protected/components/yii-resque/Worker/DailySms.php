@@ -3,12 +3,12 @@
 /**
  * Worker for ClassWorker
  */
-class Worker_OnTimeSms
+class Worker_DailySms
 {
     public function setUp()
     {
         # Set up environment for this job
-        echo "Set up\n";
+       // echo "Set up\n";
     }
 
     public function perform()
@@ -33,12 +33,12 @@ class Worker_OnTimeSms
             $logModel->errorMsg = 'utils class not exit';
         }
         $logModel->save();
-        echo "Run\n";
+      //  echo "Run\n";
     }
 
     public function tearDown()
     {
         # Remove environment for this job
-        echo "Tear down\n";
+      //  echo "Tear down\n";
     }
 }

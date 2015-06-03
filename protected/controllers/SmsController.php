@@ -60,7 +60,6 @@ class SmsController extends ApiController
                         $logModel->status = -1;
                         $this->result['msg'] = $logModel->errorMsg = $result['msg'];
                     }
-
                 } else {
                     $logModel->status = -1;
                     $this->result['msg'] = $logModel->errorMsg = 'utils class not exit';
@@ -74,7 +73,7 @@ class SmsController extends ApiController
         }
         $logModel->save();
         if ($type != SmsLogModel::TYPE_ON_TIME) {
-            $queueId = Yii::app()->resque->createJob('OnTimeSms', $worker, $args = array('id' => $logModel->id));
+            $queueId = Yii::app()->resque->createJob('DailySms', $worker, $args = array('id' => $logModel->id));
             if ($queueId) {
                 $logModel->queue_id = $queueId;
                 $logModel->save();
