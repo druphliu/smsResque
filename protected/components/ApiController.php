@@ -10,8 +10,13 @@ class ApiController extends Controller
 
     public function beforeAction($action)
     {
-        $group = Yii::app()->request->params['group'];
-        $groupInfo = GroupModel::model()->find('group=:group and status=1', array(':group' => $group));
+        $group = Yii::app()->request->getParam('group');
+        if(!$group){
+            $this->result['msg'] = 'params error';
+            die(CJSON::encode($this->result));
+        }
+
+        $groupInfo = GroupModel::model()->find('`group`=:group and `status`=1', array(':group' => $group));
         if (!$groupInfo)
             die(CJSON::encode($this->result));
         $this->groupInfo = $groupInfo;

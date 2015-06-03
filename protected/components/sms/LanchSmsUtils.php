@@ -7,7 +7,7 @@
  * Date: 2015/6/3
  * Time: 15:56
  */
-class lanchBaseSmsUtils extends BaseSmsUtils
+class LanchSmsUtils extends BaseSmsUtils
 {
 
     const SEND_URL = 'http://www.lanz.net.cn/LANZGateway/DirectSendSMSs.asp?UserID=%s&Account=%s&Password=%s&SMSType=1&Content=%s&Phones=%s&sendDate=&sendtime=';
@@ -24,7 +24,7 @@ class lanchBaseSmsUtils extends BaseSmsUtils
             if ($error == 0) {
                 $return['success'] = true;
             } else {
-                $result['msg'] = $error;
+                $return['msg'] = $error;
             }
         }
         return $return;

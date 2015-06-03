@@ -27,10 +27,10 @@ class SmsController extends ApiController
      */
     public function actionIndex()
     {
-        $sign = Yii::app()->request->params['sign'];
-        $phone = Yii::app()->request->params['phone'];
-        $content = Yii::app()->request->params['content'];
-        $type = Yii::app()->request->params['type'];
+        $sign = Yii::app()->request->getParam('sign');
+        $phone = Yii::app()->request->getParam('phone');
+        $content = Yii::app()->request->getParam('content');
+        $type = Yii::app()->request->getParam('type');
         //check sign
         $secret = $this->groupInfo->secret;
         $string = md5($phone . $content . $secret);
@@ -53,6 +53,7 @@ class SmsController extends ApiController
         $logModel->content = $content;
         $logModel->phone = $phone;
         $logModel->accountId = $this->groupInfo->accountId;
+        $logModel->type = SmsLogModel::TYPE_ON_TIME;
         $logModel->save();
         $queueId = Yii::app()->resque->createJob('OnTimeSms', $worker, $args = array('id'=>$logModel->id));
         if ($queueId) {

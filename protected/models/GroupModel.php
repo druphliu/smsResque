@@ -10,8 +10,7 @@
  * @property string $secret
  * @property string $name
  * @property string $type
- * @property string $queue
- * @property integer $stauts
+ * @property integer $status
  */
 class GroupModel extends CActiveRecord
 {
@@ -32,14 +31,13 @@ class GroupModel extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('group, secret, name', 'required'),
-			array('accountId, stauts', 'numerical', 'integerOnly'=>true),
+			array('accountId, status', 'numerical', 'integerOnly'=>true),
 			array('group, name', 'length', 'max'=>15),
 			array('secret', 'length', 'max'=>32),
 			array('type', 'length', 'max'=>5),
-			array('queue', 'length', 'max'=>6),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, accountId, group, secret, name, type, queue, stauts', 'safe', 'on'=>'search'),
+			array('id, accountId, group, secret, name, type, status', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -66,8 +64,7 @@ class GroupModel extends CActiveRecord
 			'secret' => 'Secret',
 			'name' => 'Name',
 			'type' => 'Type',
-			'queue' => '队列类型',
-			'stauts' => 'Stauts',
+			'status' => 'Status',
 		);
 	}
 
@@ -95,8 +92,7 @@ class GroupModel extends CActiveRecord
 		$criteria->compare('secret',$this->secret,true);
 		$criteria->compare('name',$this->name,true);
 		$criteria->compare('type',$this->type,true);
-		$criteria->compare('queue',$this->queue,true);
-		$criteria->compare('stauts',$this->stauts);
+		$criteria->compare('status',$this->status);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

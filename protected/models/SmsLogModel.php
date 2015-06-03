@@ -12,6 +12,8 @@
  * @property integer $status
  * @property integer $accountId
  * @property string $queue_id
+ * @property integer $type
+ * @property string $errorMsg
  */
 class SmsLogModel extends CActiveRecord
 {
@@ -34,15 +36,16 @@ class SmsLogModel extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('phone, content, create_at', 'required'),
-			array('status, accountId', 'numerical', 'integerOnly'=>true),
+			array('phone, content, type', 'required'),
+			array('status, accountId, type', 'numerical', 'integerOnly'=>true),
 			array('phone', 'length', 'max'=>11),
 			array('content', 'length', 'max'=>255),
 			array('queue_id', 'length', 'max'=>32),
+			array('errorMsg', 'length', 'max'=>10),
 			array('finished_at', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, phone, content, create_at, finished_at, status, accountId, queue_id', 'safe', 'on'=>'search'),
+			array('id, phone, content, create_at, finished_at, status, accountId, queue_id, type, errorMsg', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -68,9 +71,11 @@ class SmsLogModel extends CActiveRecord
 			'content' => 'Content',
 			'create_at' => 'Create At',
 			'finished_at' => 'Finished At',
-			'status' => 'Status',
+			'status' => '发送状态0:未发送1:成功;-1:失败',
 			'accountId' => '使用的账号ID',
 			'queue_id' => 'Queue',
+			'type' => '类型:0即时,1:非即时',
+			'errorMsg' => 'Error Msg',
 		);
 	}
 
@@ -100,6 +105,8 @@ class SmsLogModel extends CActiveRecord
 		$criteria->compare('status',$this->status);
 		$criteria->compare('accountId',$this->accountId);
 		$criteria->compare('queue_id',$this->queue_id,true);
+		$criteria->compare('type',$this->type);
+		$criteria->compare('errorMsg',$this->errorMsg,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

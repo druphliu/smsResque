@@ -27,8 +27,12 @@ class Worker_OnTimeSms
                 $logModel->status = -1;
                 $logModel->errorMsg = $result['msg'];
             }
-            $logModel->save();
+
+        }else{
+            $logModel->status = -1;
+            $logModel->errorMsg = 'utils class not exit';
         }
+        $logModel->save();
         echo "Run\n";
     }
 

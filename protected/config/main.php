@@ -16,18 +16,19 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+        'application.components.sms.*',
 	),
 
 	'modules'=>array(
 		// uncomment the following to enable the Gii tool
-		/*
+
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
+			'password'=>'admin',
 			// If removed, Gii defaults to localhost only. Edit carefully to taste.
-			'ipFilters'=>array('127.0.0.1','::1'),
+			'ipFilters'=>array('127.0.0.1','::1','*'),
 		),
-		*/
+
 	),
 
 	// application components
@@ -37,7 +38,16 @@ return array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
 		),
-
+        'resque' => array(
+            'class' => 'application.components.yii-resque.RResque',
+            'server' => 'localhost',     // Redis server address
+            'port' => '6379',            // Redis server port
+            'database' => 0,             // Redis database number
+            'password' => '',            // Redis password auth, set to '' or null when no auth needed
+            'includeFiles' => array(),    // Absolute path of files that will be included when initiate queue
+            'loghandler' => 'RotatingFile', // Monolog handler type without "handler"
+            'logtarget' => '/var/log/mylog' // Target log file or configuration (please refer to logging section)
+        ),
 		// uncomment the following to enable URLs in path-format
 		/*
 		'urlManager'=>array(
