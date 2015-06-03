@@ -51,8 +51,10 @@ class SmsController extends ApiController
                 $accountInfo = AccountModel::model()->findByPk($this->groupInfo->accountId);
                 if (class_exists($accountInfo->class)) {
                     $class = new $accountInfo->class;
-                    $result = $class->sendOneSms($logModel->phone, $logModel->content . $accountInfo->template, $accountInfo->name, $accountInfo->pswd, $accountInfo->user_id);
+                    $content = $logModel->content . $accountInfo->template;
+                    $result = $class->sendOneSms($logModel->phone, $content, $accountInfo->name, $accountInfo->pswd, $accountInfo->user_id);
                     if ($result['success']) {
+                        $logModel->content = $content;
                         $logModel->status = 1;
                         $this->result['success'] = true;
                         $this->result['msg'] = '';
