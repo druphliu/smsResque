@@ -15,7 +15,7 @@ class LanchSmsUtils extends BaseSmsUtils
     public function sendOneSms($phone, $content, $account, $pswd, $userid = '')
     {
         $content = iconv('UTF-8', 'GB2312', $content);
-        $return = array('success' => false);
+        $return = array('success' => false,'msg'=>'');
         $url = sprintf(self::SEND_URL, $userid, $account, $pswd, $content, $phone);
         $result = parent::sendHttpRequest($url);
         if ($result['content']) {

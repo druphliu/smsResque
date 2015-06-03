@@ -39,30 +39,50 @@ class SmsController extends ApiController
             die(CJSON::encode($this->result));
         }
         //入队列
-        switch ($type) {
-            case SmsLogModel::TYPE_ON_TIME:
-                $worker = 'Worker_OnTimeSms';
-                break;
-            case SmsLogModel::TYPE_DAILY:
-            default:
-                $worker = 'Worker_DailySms';
-                break;
-        }
+        //判断类型 即时不用入队 非即时入队
         //入库
         $logModel = new SmsLogModel();
         $logModel->content = $content;
         $logModel->phone = $phone;
         $logModel->accountId = $this->groupInfo->accountId;
-        $logModel->type = SmsLogModel::TYPE_ON_TIME;
-        $logModel->save();
-        $queueId = Yii::app()->resque->createJob('OnTimeSms', $worker, $args = array('id'=>$logModel->id));
-        if ($queueId) {
-            $logModel->queue_id = $queueId;
-            $logModel->save();
+        switch ($type) {
+            case SmsLogModel::TYPE_ON_TIME:
+                $logModel->type = SmsLogModel::TYPE_ON_TIME;
+                $accountInfo = AccountModel::model()->findByPk($this->groupInfo->accountId);
+                if (class_exists($accountInfo->class)) {
+                    $class = new $accountInfo->class;
+                    $result = $class->sendOneSms($logModel->phone, $logModel->content . $accountInfo->template, $accountInfo->name, $accountInfo->pswd, $accountInfo->user_id);
+                    if ($result['success']) {
+                        $logModel->status = 1;
+                        $this->result['success'] = true;
+                        $this->result['msg'] = '';
+                    } else {
+                        $logModel->status = -1;
+                        $this->result['msg'] = $logModel->errorMsg = $result['msg'];
+                    }
+
+                } else {
+                    $logModel->status = -1;
+                    $this->result['msg'] = $logModel->errorMsg = 'utils class not exit';
+                }
+                break;
+            case SmsLogModel::TYPE_DAILY:
+            default:
+                $logModel->type = SmsLogModel::TYPE_DAILY;
+                $worker = 'Worker_DailySms';
+                break;
         }
-        $this->result['success'] = true;
-        $this->result['msg'] = '';
-        $this->result['queueId'] = $queueId;
+        $logModel->save();
+        if ($type != SmsLogModel::TYPE_ON_TIME) {
+            $queueId = Yii::app()->resque->createJob('OnTimeSms', $worker, $args = array('id' => $logModel->id));
+            if ($queueId) {
+                $logModel->queue_id = $queueId;
+                $logModel->save();
+                $this->result['success'] = true;
+                $this->result['msg'] = '';
+                $this->result['queueId'] = $queueId;
+            }
+        }
         die(CJSON::encode($this->result));
     }
 
