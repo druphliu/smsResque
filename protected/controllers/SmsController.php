@@ -30,7 +30,7 @@ class SmsController extends ApiController
         $sign = Yii::app()->request->getParam('sign');
         $phone = Yii::app()->request->getParam('phone');
         $content = Yii::app()->request->getParam('content');
-        $type = Yii::app()->request->getParam('type');
+        $type = Yii::app()->request->getParam('type', SmsLogModel::TYPE_DAILY);
         //check sign
         $secret = $this->groupInfo->secret;
         $string = md5($phone . $content . $secret);
@@ -40,21 +40,22 @@ class SmsController extends ApiController
         }
         //入队列
         //判断类型 即时不用入队 非即时入队
-        //入库
-        $logModel = new SmsLogModel();
-        $logModel->content = $content;
-        $logModel->phone = $phone;
-        $logModel->accountId = $this->groupInfo->accountId;
+
         switch ($type) {
             case SmsLogModel::TYPE_ON_TIME:
+                //入库
+                $logModel = new SmsLogModel();
+                $logModel->phone = $phone;
+                $logModel->accountId = $this->groupInfo->accountId;
                 $logModel->type = SmsLogModel::TYPE_ON_TIME;
+                $logModel->content = $content;
                 $accountInfo = AccountModel::model()->findByPk($this->groupInfo->accountId);
                 if (class_exists($accountInfo->class)) {
                     $class = new $accountInfo->class;
                     $content = $logModel->content . $accountInfo->template;
+                    $logModel->content = $content;
                     $result = $class->sendOneSms($logModel->phone, $content, $accountInfo->name, $accountInfo->pswd, $accountInfo->user_id);
                     if ($result['success']) {
-                        $logModel->content = $content;
                         $logModel->status = 1;
                         $this->result['success'] = true;
                         $this->result['msg'] = '';
@@ -66,19 +67,17 @@ class SmsController extends ApiController
                     $logModel->status = -1;
                     $this->result['msg'] = $logModel->errorMsg = 'utils class not exit';
                 }
+                $logModel->save();
                 break;
             case SmsLogModel::TYPE_DAILY:
             default:
-                $logModel->type = SmsLogModel::TYPE_DAILY;
                 $worker = 'Worker_DailySms';
                 break;
         }
-        $logModel->save();
         if ($type != SmsLogModel::TYPE_ON_TIME) {
-            $queueId = Yii::app()->resque->createJob('DailySms', $worker, $args = array('id' => $logModel->id));
+            $queueId = Yii::app()->resque->createJob('DailySms', $worker,
+                $args = array('phone' => $phone, 'content' => $content, 'accountId' => $this->groupInfo->accountId));
             if ($queueId) {
-                $logModel->queue_id = $queueId;
-                $logModel->save();
                 $this->result['success'] = true;
                 $this->result['msg'] = '';
                 $this->result['queueId'] = $queueId;
